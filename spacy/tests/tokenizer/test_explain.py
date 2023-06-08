@@ -16,6 +16,7 @@ LANGUAGES = [
     pytest.param("fr", marks=pytest.mark.slow()),
     pytest.param("af", marks=pytest.mark.slow()),
     pytest.param("ar", marks=pytest.mark.slow()),
+    pytest.param("bal", marks=pytest.mark.slow()),
     pytest.param("bg", marks=pytest.mark.slow()),
     "bn",
     pytest.param("ca", marks=pytest.mark.slow()),
@@ -86,7 +87,9 @@ def test_tokenizer_explain_special_matcher(en_vocab):
 
 
 @hypothesis.strategies.composite
-def sentence_strategy(draw: hypothesis.strategies.DrawFn, max_n_words: int = 4) -> str:
+def sentence_strategy(
+    draw: hypothesis.strategies.DrawFn, max_n_words: int = 4
+) -> str:
     """
     Composite strategy for fuzzily generating sentence with varying interpunctation.
 
@@ -102,10 +105,16 @@ def sentence_strategy(draw: hypothesis.strategies.DrawFn, max_n_words: int = 4) 
     sentence = [
         [
             draw(hypothesis.strategies.text(min_size=1)),
-            draw(hypothesis.strategies.from_regex(punctuation_and_space_regex)),
+            draw(
+                hypothesis.strategies.from_regex(punctuation_and_space_regex)
+            ),
         ]
         for _ in range(
-            draw(hypothesis.strategies.integers(min_value=2, max_value=max_n_words))
+            draw(
+                hypothesis.strategies.integers(
+                    min_value=2, max_value=max_n_words
+                )
+            )
         )
     ]
 

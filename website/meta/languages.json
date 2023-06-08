@@ -21,6 +21,11 @@
             "has_examples": true
         },
         {
+            "code": "bal",
+            "name": "Balochi",
+            "has_examples": true
+        },
+        {
             "code": "bg",
             "name": "Bulgarian",
             "example": "Това е изречение",

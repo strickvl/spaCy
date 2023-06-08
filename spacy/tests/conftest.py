@@ -69,6 +69,9 @@ def am_tokenizer():
 def ar_tokenizer():
     return get_lang_class("ar")().tokenizer
 
+@pytest.fixture(scope="session")
+def bal_tokenizer():
+    return get_lang_class("bal")().tokenizer
 
 @pytest.fixture(scope="session")
 def bg_tokenizer():

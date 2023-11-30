@@ -77,8 +77,8 @@ def project_run(
     validate_subcommand(list(commands.keys()), list(workflows.keys()), subcommand)
 
     req_path = project_dir / "requirements.txt"
-    if not skip_requirements_check:
-        if config.get("check_requirements", True) and os.path.exists(req_path):
+    if config.get("check_requirements", True) and os.path.exists(req_path):
+        if not skip_requirements_check:
             with req_path.open() as requirements_file:
                 _check_requirements([req.strip() for req in requirements_file])
 
@@ -131,8 +131,7 @@ def print_run_help(project_dir: Path, subcommand: Optional[str] = None) -> None:
         validate_subcommand(list(commands.keys()), list(workflows.keys()), subcommand)
         print(f"Usage: {COMMAND} project run {subcommand} {project_loc}")
         if subcommand in commands:
-            help_text = commands[subcommand].get("help")
-            if help_text:
+            if help_text := commands[subcommand].get("help"):
                 print(f"\n{help_text}\n")
         elif subcommand in workflows:
             steps = workflows[subcommand]
@@ -146,8 +145,7 @@ def print_run_help(project_dir: Path, subcommand: Optional[str] = None) -> None:
             print(f"For command details, run: {help_cmd}")
     else:
         print("")
-        title = config.get("title")
-        if title:
+        if title := config.get("title"):
             print(f"{locale_escape(title)}\n")
         if config_commands:
             print(f"Available commands in {PROJECT_FILE}")
@@ -207,7 +205,7 @@ def validate_subcommand(
         msg.fail(f"No commands or workflows defined in {PROJECT_FILE}", exits=1)
     if subcommand not in commands and subcommand not in workflows:
         help_msg = []
-        if subcommand in ["assets", "asset"]:
+        if subcommand in {"assets", "asset"}:
             help_msg.append("Did you mean to run: python -m spacy project assets?")
         if commands:
             help_msg.append(f"Available commands: {', '.join(commands)}")

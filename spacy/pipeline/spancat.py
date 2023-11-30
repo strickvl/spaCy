@@ -102,7 +102,7 @@ def ngram_suggester(
                 assert spans[-1].ndim == 2, spans[-1].shape
         lengths.append(length)
     lengths_array = ops.asarray1i(lengths)
-    if len(spans) > 0:
+    if spans:
         output = Ragged(ops.xp.vstack(spans), lengths_array)
     else:
         output = Ragged(ops.xp.zeros((0, 0), dtype="i"), lengths_array)
@@ -127,11 +127,11 @@ def preset_spans_suggester(
 
         lengths.append(length)
     lengths_array = cast(Ints1d, ops.asarray(lengths, dtype="i"))
-    if len(spans) > 0:
-        output = Ragged(ops.asarray(spans, dtype="i"), lengths_array)
-    else:
-        output = Ragged(ops.xp.zeros((0, 0), dtype="i"), lengths_array)
-    return output
+    return (
+        Ragged(ops.asarray(spans, dtype="i"), lengths_array)
+        if spans
+        else Ragged(ops.xp.zeros((0, 0), dtype="i"), lengths_array)
+    )
 
 
 @registry.misc("spacy.ngram_suggester.v1")
@@ -323,10 +323,7 @@ class _Intervals:
 
     def __contains__(self, rang):
         i, j = rang
-        for e in range(i, j):
-            if e in self.ranges:
-                return True
-        return False
+        return any(e in self.ranges for e in range(i, j))
 
 
 class SpanCategorizer(TrainablePipe):
@@ -466,18 +463,12 @@ class SpanCategorizer(TrainablePipe):
     @property
     def _n_labels(self) -> int:
         """RETURNS (int): Number of labels."""
-        if self.add_negative_label:
-            return len(self.labels) + 1
-        else:
-            return len(self.labels)
+        return len(self.labels) + 1 if self.add_negative_label else len(self.labels)
 
     @property
     def _negative_label_i(self) -> Union[int, None]:
         """RETURNS (Union[int, None]): Index of the negative label."""
-        if self.add_negative_label:
-            return len(self.label_data)
-        else:
-            return None
+        return len(self.label_data) if self.add_negative_label else None
 
     def predict(self, docs: Iterable[Doc]):
         """Apply the pipeline's model to a batch of docs, without modifying them.

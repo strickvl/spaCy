@@ -291,18 +291,18 @@ class EntityLinker(TrainablePipe):
                 doc.ents = ents
             doc_sample.append(doc)
             vector_sample.append(self.model.ops.alloc1f(nO))
-        assert len(doc_sample) > 0, Errors.E923.format(name=self.name)
-        assert len(vector_sample) > 0, Errors.E923.format(name=self.name)
+        assert doc_sample, Errors.E923.format(name=self.name)
+        assert vector_sample, Errors.E923.format(name=self.name)
 
         # XXX In order for size estimation to work, there has to be at least
         # one entity. It's not used for training so it doesn't have to be real,
         # so we add a fake one if none are present.
         # We can't use Doc.has_annotation here because it can be True for docs
         # that have been through an NER component but got no entities.
-        has_annotations = any([doc.ents for doc in doc_sample])
+        has_annotations = any(doc.ents for doc in doc_sample)
         if not has_annotations:
             doc = doc_sample[0]
-            ent = doc[0:1]
+            ent = doc[:1]
             ent.label_ = "XXX"
             doc.ents = (ent,)
 
@@ -322,8 +322,7 @@ class EntityLinker(TrainablePipe):
 
         for eg in examples:
             for ent in eg.predicted.ents:
-                candidates = list(self.get_candidates(self.kb, ent))
-                if candidates:
+                if candidates := list(self.get_candidates(self.kb, ent)):
                     return True
 
         return False
@@ -398,8 +397,7 @@ class EntityLinker(TrainablePipe):
             kb_ids = eg.get_aligned("ENT_KB_ID", as_string=True)
 
             for ent in eg.get_matching_ents():
-                kb_id = kb_ids[ent.start]
-                if kb_id:
+                if kb_id := kb_ids[ent.start]:
                     entity_encoding = self.kb.get_vector(kb_id)
                     entity_encodings.append(entity_encoding)
                     keep_ents.append(eidx)
@@ -448,7 +446,7 @@ class EntityLinker(TrainablePipe):
         for i, doc in enumerate(docs):
             if len(doc) == 0:
                 continue
-            sentences = [s for s in doc.sents]
+            sentences = list(doc.sents)
 
             # Loop over entities in batches.
             for ent_idx in range(0, len(doc.ents), self.candidates_batch_size):
@@ -542,7 +540,7 @@ class EntityLinker(TrainablePipe):
                                 else EntityLinker.NIL
                             )
 
-        if not (len(final_kb_ids) == entity_count):
+        if len(final_kb_ids) != entity_count:
             err = Errors.E147.format(
                 method="predict", msg="result variables not of equal length"
             )
@@ -622,8 +620,7 @@ class EntityLinker(TrainablePipe):
 
         DOCS: https://spacy.io/api/entitylinker#to_disk
         """
-        serialize = {}
-        serialize["vocab"] = lambda p: self.vocab.to_disk(p, exclude=exclude)
+        serialize = {"vocab": lambda p: self.vocab.to_disk(p, exclude=exclude)}
         serialize["cfg"] = lambda p: srsly.write_json(p, self.cfg)
         serialize["kb"] = lambda p: self.kb.to_disk(p)
         serialize["model"] = lambda p: self.model.to_disk(p)

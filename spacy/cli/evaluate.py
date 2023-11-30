@@ -116,7 +116,7 @@ def evaluate(
         for metric, key in metrics.items():
             if key in scores:
                 if key == "cats_score":
-                    metric = metric + " (" + scores.get("cats_score_desc", "unk") + ")"
+                    metric = f"{metric} (" + scores.get("cats_score_desc", "unk") + ")"
                 if isinstance(scores[key], (int, float)):
                     if key == "speed":
                         results[metric] = f"{scores[key]:.0f}"

@@ -80,7 +80,7 @@ def test_cli_converters_conllu_empty_heads_ner():
 """
     docs = list(conllu_to_docs(input_data))
     # heads are all 0
-    assert not all([t.head.i for t in docs[0]])
+    assert not all(t.head.i for t in docs[0])
     # NER is unset
     assert not docs[0].has_annotation("ENT_IOB")
 
@@ -691,7 +691,7 @@ def test_string_to_list_intify(value):
 
 
 def test_download_compatibility():
-    spec = SpecifierSet("==" + about.__version__)
+    spec = SpecifierSet(f"=={about.__version__}")
     spec.prereleases = False
     if about.__version__ in spec:
         model_name = "en_core_web_sm"
@@ -701,7 +701,7 @@ def test_download_compatibility():
 
 
 def test_validate_compatibility_table():
-    spec = SpecifierSet("==" + about.__version__)
+    spec = SpecifierSet(f"=={about.__version__}")
     spec.prereleases = False
     if about.__version__ in spec:
         model_pkgs, compat = get_model_pkgs()
@@ -1284,10 +1284,9 @@ def test_debug_data_trainable_lemmatizer_basic():
         ("Eat blue ham", {"lemmas": ["eat", "blue", "ham"]}),
     ]
     nlp = Language()
-    train_examples = []
-    for t in examples:
-        train_examples.append(Example.from_dict(nlp.make_doc(t[0]), t[1]))
-
+    train_examples = [
+        Example.from_dict(nlp.make_doc(t[0]), t[1]) for t in examples
+    ]
     data = _compile_gold(train_examples, ["trainable_lemmatizer"], nlp, True)
     # ref test_edit_tree_lemmatizer::test_initialize_from_labels
     # this results in 4 trees
@@ -1308,10 +1307,9 @@ def test_debug_data_trainable_lemmatizer_partial():
         ),
     ]
     nlp = Language()
-    train_examples = []
-    for t in partial_examples:
-        train_examples.append(Example.from_dict(nlp.make_doc(t[0]), t[1]))
-
+    train_examples = [
+        Example.from_dict(nlp.make_doc(t[0]), t[1]) for t in partial_examples
+    ]
     data = _compile_gold(train_examples, ["trainable_lemmatizer"], nlp, True)
     assert data["partial_lemma_annotations"] == 2
 
@@ -1322,10 +1320,10 @@ def test_debug_data_trainable_lemmatizer_low_cardinality():
         ("Eat blue ham", {"lemmas": ["no", "no", "no"]}),
     ]
     nlp = Language()
-    train_examples = []
-    for t in low_cardinality_examples:
-        train_examples.append(Example.from_dict(nlp.make_doc(t[0]), t[1]))
-
+    train_examples = [
+        Example.from_dict(nlp.make_doc(t[0]), t[1])
+        for t in low_cardinality_examples
+    ]
     data = _compile_gold(train_examples, ["trainable_lemmatizer"], nlp, True)
     assert data["n_low_cardinality_lemmas"] == 2
 
@@ -1336,9 +1334,9 @@ def test_debug_data_trainable_lemmatizer_not_annotated():
         ("Eat blue ham", {}),
     ]
     nlp = Language()
-    train_examples = []
-    for t in unannotated_examples:
-        train_examples.append(Example.from_dict(nlp.make_doc(t[0]), t[1]))
-
+    train_examples = [
+        Example.from_dict(nlp.make_doc(t[0]), t[1])
+        for t in unannotated_examples
+    ]
     data = _compile_gold(train_examples, ["trainable_lemmatizer"], nlp, True)
     assert data["no_lemma_annotations"] == 2

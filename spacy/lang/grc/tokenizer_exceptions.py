@@ -2,11 +2,10 @@ from ..tokenizer_exceptions import BASE_EXCEPTIONS
 from ...symbols import ORTH, NORM
 from ...util import update_exc
 
-_exc = {}
-
-for token in ["᾽Απ'", "᾽ΑΠ'", "ἀφ'", "᾽Αφ", "ἀπὸ"]:
-    _exc[token] = [{ORTH: token, NORM: "από"}]
-
+_exc = {
+    token: [{ORTH: token, NORM: "από"}]
+    for token in ["᾽Απ'", "᾽ΑΠ'", "ἀφ'", "᾽Αφ", "ἀπὸ"]
+}
 for token in ["᾽Αλλ'", "ἀλλ'", "ἀλλὰ"]:
     _exc[token] = [{ORTH: token, NORM: "ἀλλά"}]
 

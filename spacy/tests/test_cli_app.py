@@ -200,10 +200,7 @@ def test_project_clone(options):
     with make_tempdir() as workspace:
         out = workspace / "project"
         target = "benchmarks/ner_conll03"
-        if not options:
-            options = []
-        else:
-            options = options.split()
+        options = [] if not options else options.split()
         result = CliRunner().invoke(
             app, ["project", "clone", target, *options, str(out)]
         )

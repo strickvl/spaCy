@@ -119,10 +119,8 @@ class RussianLemmatizer(Lemmatizer):
         analyses = self._morph.parse(string)
         # often multiple forms would derive from the same normal form
         # thus check _unique_ normal forms
-        normal_forms = set([an.normal_form for an in analyses])
-        if len(normal_forms) == 1:
-            return [next(iter(normal_forms))]
-        return [string]
+        normal_forms = {an.normal_form for an in analyses}
+        return [next(iter(normal_forms))] if len(normal_forms) == 1 else [string]
 
     def pymorphy2_lemmatize(self, token: Token) -> List[str]:
         return self._pymorphy_lemmatize(token)
@@ -207,7 +205,7 @@ def oc2ud(oc_tag: str) -> Tuple[str, Dict[str, str]]:
                     morphology[categ] = gmap[gram]
         if not match:
             unmatched.add(gram)
-    while len(unmatched) > 0:
+    while unmatched:
         gram = unmatched.pop()
         if gram in ("Name", "Patr", "Surn", "Geox", "Orgn"):
             pos = "PROPN"

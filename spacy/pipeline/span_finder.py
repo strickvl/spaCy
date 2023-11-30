@@ -187,8 +187,7 @@ class SpanFinder(TrainablePipe):
 
         DOCS: https://spacy.io/api/spanfinder#predict
         """
-        scores = self.model.predict(docs)
-        return scores
+        return self.model.predict(docs)
 
     def set_annotations(self, docs: Iterable[Doc], scores: Floats2d) -> None:
         """Modify a batch of Doc objects, using pre-computed scores.

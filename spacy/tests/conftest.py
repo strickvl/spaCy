@@ -1,6 +1,7 @@
 import pytest
-from spacy.util import get_lang_class
 from hypothesis import settings
+
+from spacy.util import get_lang_class
 
 # Functionally disable deadline settings for tests
 # to prevent spurious test failures in CI builds.
@@ -165,6 +166,11 @@ def fi_tokenizer():
 
 
 @pytest.fixture(scope="session")
+def fo_tokenizer():
+    return get_lang_class("fo")().tokenizer
+
+
+@pytest.fixture(scope="session")
 def fr_tokenizer():
     return get_lang_class("fr")().tokenizer
 
@@ -317,6 +323,11 @@ def nl_vocab():
 @pytest.fixture(scope="session")
 def nl_tokenizer():
     return get_lang_class("nl")().tokenizer
+
+
+@pytest.fixture(scope="session")
+def nn_tokenizer():
+    return get_lang_class("nn")().tokenizer
 
 
 @pytest.fixture(scope="session")
